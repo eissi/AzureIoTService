@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Common.Exceptions;
@@ -45,6 +46,9 @@ namespace IoTConsole
         static string desc;
         static void Main(string[] args)
         {
+            Trace.Listeners.Add(new TextWriterTraceListener("console.log"));
+            Trace.AutoFlush = true;
+
             instanceTime = DateTime.Now;
 
             conn = new SqlConnection("Server=tcp:iotjulee.database.windows.net,1433;Database=IotHubDemo;User ID=julee@iotjulee;Password=Passw0rd;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
@@ -123,14 +127,14 @@ namespace IoTConsole
 
         private async static Task SendCloudToDeviceMessageAsync()
         {
-            Console.WriteLine("SENT ROUTINE STARTED.");
+            Trace.TraceInformation("SENT ROUTINE STARTED.");
             //bool commandProcessed = false;
             startTime = DateTime.Now;
             startTimeString = startTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
             var commandMessage = new Message(Encoding.ASCII.GetBytes(deviceId+","+startTimeString));
             //commandMessage.Ack = DeliveryAcknowledgement.Full;
             await serviceClient.SendAsync(deviceId, commandMessage);
-            Console.WriteLine("SENT: {0}", startTimeString);
+            Trace.TraceInformation("SENT: {0}", startTimeString);
         }
         private async static Task ReceiveMessagesFromDeviceAsync(string partition)
         {
@@ -144,7 +148,7 @@ namespace IoTConsole
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Exception in reading events!");
+                    Trace.TraceError("Exception in reading events!");
                 }
 
                 if (eventData == null) continue;                
@@ -152,7 +156,7 @@ namespace IoTConsole
                 IoTHubMessage msg = new IoTHubMessage();
                 msg.enqueuedTime = eventData.EnqueuedTimeUtc;
                 msg.message = Encoding.UTF8.GetString(eventData.GetBytes());
-                Console.WriteLine("RECEIVED: {0}", msg.message);
+                Trace.TraceInformation("RECEIVED: {0}", msg.message);
                 ProcessMessageAsync(msg);
             }
         }
@@ -198,7 +202,7 @@ namespace IoTConsole
                 cmd.ExecuteScalar();
 
 
-                Console.WriteLine("Processed: {0},{1},{2}", msg.message, finish, elapsedTime.TotalMilliseconds);
+                Trace.TraceInformation("Processed: {0},{1},{2}", msg.message, finish, elapsedTime.TotalMilliseconds);
                 startTimeString = "";
                 await SendCloudToDeviceMessageAsync();
             }
@@ -206,7 +210,7 @@ namespace IoTConsole
             {
                 if ((timeout < (DateTime.Now - startTime).TotalSeconds) && startTimeString != "")
                 {
-                    Console.WriteLine("TIMEOUT occurred");
+                    Trace.TraceWarning("TIMEOUT occurred");
 
                     DateTime finishTime = DateTime.Now;
                     string finish = finishTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
@@ -240,7 +244,7 @@ namespace IoTConsole
                 }
                 else
                 {
-                    Console.WriteLine("NOT PROCESSED: the message is not for this service!");
+                    Trace.TraceInformation("NOT PROCESSED: the message is not for this service!");
                 }
             }
         }

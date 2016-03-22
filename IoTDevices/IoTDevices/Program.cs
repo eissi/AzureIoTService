@@ -106,7 +106,7 @@ namespace IoTDevices
 
                 string serviceMessage = Encoding.ASCII.GetString(receivedMessage.GetBytes());
 
-                Console.WriteLine("RECEIED: {0}", DateTime.Now);
+                Console.WriteLine("RECEIVED: {0}", DateTime.Now);
 
                 try
                 {
@@ -120,16 +120,16 @@ namespace IoTDevices
                     Console.WriteLine("Message Sent: {0}", messagestring);
                     Console.ResetColor();
 
+                    await deviceClient.CompleteAsync(receivedMessage);
                 }
                 catch (Exception exception)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("{0} > Exception: {1}", DateTime.Now, exception.Message);
                     Console.ResetColor();
-                }
-
+                }               
                 
-                await deviceClient.CompleteAsync(receivedMessage);
+                
                                 
             }
         }

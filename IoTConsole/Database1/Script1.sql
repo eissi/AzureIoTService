@@ -12,7 +12,7 @@ select * from dbo.PerfLogs where InstanceStartTime=(select top 1 InstanceStartTi
 
 select datediff(ms,ServiceSendTime,DeviceTime) as S2DTime, datediff(ms,DeviceTime,IoTHubReceiveTime) as D2HTime, datediff(ms,IotHubReceiveTime,ServiceReceiveTime) as H2STime, ElapsedTime as [Total Elapsed Time] from dbo.PerfLogs where InstanceStartTime=(select top 1 InstanceStartTime from dbo.PerfLogs group by InstanceStartTime order by InstanceStartTime desc)
 
-select success, count(*) as [Count], avg(elapsedtime) as [Average Transaction Time] from dbo.PerfLogs where InstanceStartTime=(select top 1 InstanceStartTime from dbo.PerfLogs group by InstanceStartTime order by InstanceStartTime desc) group by Success
+select replace(success,'1','SUCCESS'), count(*) as [Count], avg(elapsedtime) as [Average Transaction Time] from dbo.PerfLogs where InstanceStartTime=(select top 1 InstanceStartTime from dbo.PerfLogs group by InstanceStartTime order by InstanceStartTime desc) group by Success
 
 select replace(success,'1','SUCCESS') as [Success or Fail],count(*) as [Number of transactions] from dbo.PerfLogs where Description='single machine 2nd' group by Success
 select * from dbo.PerfLogs where Description='single machine' and success='0' 
