@@ -15,6 +15,11 @@ using System.Data.SqlClient;
 
 namespace IoTConsole
 {
+    class IoTHubMessage
+    {
+        public string message;
+        public DateTime enqueuedTime;
+    }
     class Program
     {
         static RegistryManager registryManager;
@@ -28,26 +33,45 @@ namespace IoTConsole
         static string iotHubD2cEndpoint = "messages/events";
         static EventHubClient eventHubClient;
 
-        static string commandReceived="";
-        static DateTime commandReceivedTime;
-        static int timeout = 10; //seconds
+        static int timeout =10; //seconds
+
+        static DateTime instanceTime;
+        static SqlConnection conn;
+        static string dvcSDKver;
+        static string svcSDKver;
+        static string deviceId;
+        static DateTime startTime;
+        static string startTimeString="";
+        static string desc;
         static void Main(string[] args)
         {
-            DateTime instanceTime = DateTime.Now;
+            instanceTime = DateTime.Now;
 
-            var conn = new SqlConnection("Server=tcp:iotjulee.database.windows.net,1433;Database=IotHubDemo;User ID=julee@iotjulee;Password=Passw0rd;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+            conn = new SqlConnection("Server=tcp:iotjulee.database.windows.net,1433;Database=IotHubDemo;User ID=julee@iotjulee;Password=Passw0rd;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             conn.Open();
 
-            string dvcSDKver = ".Net 1.0.2";
-            string svcSDKver = ".Net 1.0.3";
-            
-            System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\julee\iothubperf.txt", true);
+            dvcSDKver = ".Net 1.0.2";
+            svcSDKver = ".Net 1.0.3";
+
+            //System.IO.StreamWriter file = new System.IO.StreamWriter(@"C:\Users\julee\iothubperf.txt", true);
 
             Console.WriteLine("Start to send Cloud-to-Device message\n");
             serviceClient = ServiceClient.CreateFromConnectionString(serviceConnectionString);
 
-            ReceiveFeedbackAsync();
+            //ReceiveFeedbackAsync();
 
+
+
+            Console.Write("Enter the device ID:");
+            deviceId = Console.ReadLine();
+            //string deviceId = "demo";
+            Console.Write("Enter the device SDK version:");
+            dvcSDKver = Console.ReadLine();
+            Console.Write("Enter a description:");
+            desc = Console.ReadLine();
+
+            //while (true)
+            //{
             //receive용
             eventHubClient = EventHubClient.CreateFromConnectionString(eventhubconnectionString, iotHubD2cEndpoint);
             var d2cPartitions = eventHubClient.GetRuntimeInformation().PartitionIds;
@@ -55,158 +79,65 @@ namespace IoTConsole
             {
                 ReceiveMessagesFromDeviceAsync(partition);
             }
-            
-            Console.Write("Enter the device ID:");
-            string deviceId = Console.ReadLine();
-            //string deviceId = "demo";
-            Console.Write("Enter the device SDK version:");
-            dvcSDKver = Console.ReadLine();
-            Console.Write("Enter a description:");
-            string desc = Console.ReadLine();
 
-            while (true)
+            try
             {
-                bool commandProcessed = false;
-                DateTime commandTime = DateTime.Now;
-                string command = commandTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
-                try { 
-                    SendCloudToDeviceMessageAsync(deviceId, command).Wait();
-                }
-                catch(Exception e)
-                {
-                    continue;
-                }
-                Console.WriteLine("SENT: {0}", command);
-
-                while (!commandProcessed)
-                {
-                    if (commandReceived != "")
-                    {
-                        Console.WriteLine("Enter: Processing command received! - {0}", commandReceived);
-                        string[] timing = commandReceived.Split(',');
-                        if (command == timing[0])
-                        {
-                            DateTime finishTime = DateTime.Now;
-                            string finish = finishTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
-                            DateTime devTime;
-                            string devTimeString = timing[1];
-                            DateTime.TryParseExact(devTimeString, "yyyy-MM-dd HH:mm:ss:fffff", null, System.Globalization.DateTimeStyles.None, out devTime);
-                            TimeSpan elapsedTime = finishTime - commandTime;
-                            //file.WriteLine("{0},{1},{2}", commandReceived, finish, elapsedTime.TotalMilliseconds);
-                            //file.FlushAsync();
-
-                            var cmd = conn.CreateCommand();
-                            cmd.CommandText = @"
-                INSERT dbo.PerfLogs (DeviceID, ServiceSendTime, DeviceTime, IoTHubReceiveTime, ServiceReceiveTime, ElapsedTime, TimeOut, Success, ServiceSDKversion, DeviceSDKversion, InstanceStartTime, Description)
-                VALUES (@DeviceID, @ServiceSendTime, @DeviceTime, @IoTHubReceiveTime, @ServiceReceiveTime, @ElapsedTime, @TimeOut, @Success, @ServiceSDKversion, @DeviceSDKversion, @InstanceStartTime, @Description)";
-
-                            cmd.Parameters.AddWithValue("@DeviceID", deviceId);
-                            cmd.Parameters.AddWithValue("@ServiceSendTime", commandTime.ToUniversalTime());
-                            cmd.Parameters.AddWithValue("@ServiceReceiveTime", finishTime.ToUniversalTime());
-                            cmd.Parameters.AddWithValue("@ElapsedTime", elapsedTime.TotalMilliseconds);
-                            cmd.Parameters.AddWithValue("@TimeOut", 30000);
-                            cmd.Parameters.AddWithValue("@Success", 1);
-                            cmd.Parameters.AddWithValue("@ServiceSDKversion", svcSDKver);
-                            cmd.Parameters.AddWithValue("@DeviceSDKversion", dvcSDKver);
-
-                            cmd.Parameters.AddWithValue("@DeviceTime", devTime.ToUniversalTime());
-                            cmd.Parameters.AddWithValue("@IoTHubReceiveTime", commandReceivedTime);
-
-                            cmd.Parameters.AddWithValue("@InstanceStartTime", instanceTime.ToUniversalTime());
-
-                            cmd.Parameters.AddWithValue("@Description", desc);
-
-
-                            cmd.ExecuteScalar();
-
-                           
-                            Console.WriteLine("Received: {0},{1},{2}", commandReceived, finish, elapsedTime.TotalMilliseconds);
-                            commandReceived = "";
-                            commandProcessed = true;
-                        }
-                        commandReceived = "";
-
-
-
-                    }
-
-                    //no command received yet
-                    //Console.WriteLine("Command Not Received");
-                    Thread.Sleep(100);
-
-                    //if timeout occurred
-                    if(timeout < (DateTime.Now - commandTime).TotalSeconds)
-                    {
-                        Console.WriteLine("TIMEOUT occurred");
-
-                        DateTime finishTime = DateTime.Now;
-                        string finish = finishTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
-                        
-                        var cmd = conn.CreateCommand();
-                        cmd.CommandText = @"
-                INSERT dbo.PerfLogs (DeviceID, ServiceSendTime, ServiceReceiveTime, TimeOut, Success, ServiceSDKversion, DeviceSDKversion, InstanceStartTime, Description)
-                VALUES (@DeviceID, @ServiceSendTime, @ServiceReceiveTime, @TimeOut, @Success, @ServiceSDKversion, @DeviceSDKversion, @InstanceStartTime, @Description)";
-
-                        cmd.Parameters.AddWithValue("@DeviceID", deviceId);
-                        cmd.Parameters.AddWithValue("@ServiceSendTime", commandTime.ToUniversalTime());
-                        cmd.Parameters.AddWithValue("@ServiceReceiveTime", finishTime.ToUniversalTime());
-                        //cmd.Parameters.AddWithValue("@ElapsedTime", elapsedTime.TotalMilliseconds);
-                        cmd.Parameters.AddWithValue("@TimeOut", timeout);
-                        cmd.Parameters.AddWithValue("@Success", 0);
-                        cmd.Parameters.AddWithValue("@ServiceSDKversion", svcSDKver);
-                        cmd.Parameters.AddWithValue("@DeviceSDKversion", dvcSDKver);
-
-                        //cmd.Parameters.AddWithValue("@DeviceTime", devTime);
-                        //cmd.Parameters.AddWithValue("@IoTHubReceiveTime", commandReceivedTime);
-
-                        cmd.Parameters.AddWithValue("@InstanceStartTime", instanceTime.ToUniversalTime());
-
-                        cmd.Parameters.AddWithValue("@Description", desc);
-
-
-                        cmd.ExecuteScalar();
-
-                        commandReceived = "";
-                        commandProcessed = true;
-                                                
-                    }
-
-                }
-
+                SendCloudToDeviceMessageAsync().Wait();
             }
-            Console.WriteLine("Program exit. Type Enter.");
+            catch (Exception e)
+            {
+                
+            }
+
+
+
+            //    while (!commandProcessed)
+            //    {
+            //        if (commandReceived != "")
+            //        {
+
+            //            }
+            //            commandReceived = "";
+
+
+
+            //        }
+
+            //        //no command received yet
+            //        //Console.WriteLine("Command Not Received");
+            //        Thread.Sleep(100);
+
+            //        //if timeout occurred
+
+
+            //    }
+
+            //}
+            Console.WriteLine("Program Running. Pless anykey to terminate!");
             Console.ReadLine();
 
             conn.Close();
 
 
         }
-        private async static Task AddDeviceAsync(string deviceId)
+
+        private async static Task SendCloudToDeviceMessageAsync()
         {
-            //string deviceId = "myFirstDevice4";
-            Device device;
-            try
-            {
-                device = await registryManager.AddDeviceAsync(new Device(deviceId));
-            }
-            catch (DeviceAlreadyExistsException)
-            {
-                device = await registryManager.GetDeviceAsync(deviceId);
-            }
-            Console.WriteLine("Generated device key: {0}", device.Authentication.SymmetricKey.PrimaryKey);
-        }
-        private async static Task SendCloudToDeviceMessageAsync(string deviceId, string command)
-        {
-            var commandMessage = new Message(Encoding.ASCII.GetBytes(command));
+            Console.WriteLine("SENT ROUTINE STARTED.");
+            //bool commandProcessed = false;
+            startTime = DateTime.Now;
+            startTimeString = startTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
+            var commandMessage = new Message(Encoding.ASCII.GetBytes(deviceId+","+startTimeString));
             //commandMessage.Ack = DeliveryAcknowledgement.Full;
             await serviceClient.SendAsync(deviceId, commandMessage);
+            Console.WriteLine("SENT: {0}", startTimeString);
         }
         private async static Task ReceiveMessagesFromDeviceAsync(string partition)
         {
             var eventHubReceiver = eventHubClient.GetDefaultConsumerGroup().CreateReceiver(partition, DateTime.Now);
             while (true)
             {
-                EventData eventData=null;
+                EventData eventData = null;
                 try
                 {
                     eventData = await eventHubReceiver.ReceiveAsync();
@@ -215,14 +146,102 @@ namespace IoTConsole
                 {
                     Console.WriteLine("Exception in reading events!");
                 }
-                
-                if (eventData == null) continue;
 
-                commandReceived = Encoding.UTF8.GetString(eventData.GetBytes());
-                commandReceivedTime = eventData.EnqueuedTimeUtc;
+                if (eventData == null) continue;                
 
-                Console.WriteLine("RECEIVED: {0}", commandReceived);
-                
+                IoTHubMessage msg = new IoTHubMessage();
+                msg.enqueuedTime = eventData.EnqueuedTimeUtc;
+                msg.message = Encoding.UTF8.GetString(eventData.GetBytes());
+                Console.WriteLine("RECEIVED: {0}", msg.message);
+                ProcessMessageAsync(msg);
+            }
+        }
+
+        static async void ProcessMessageAsync(IoTHubMessage msg)
+        {
+            //Console.WriteLine("Enter: Processing command received! - {0}", msg.message);
+            string[] timing = msg.message.Split(',');
+            if (timing.Length != 3) return;
+            if (startTimeString == timing[1])
+            {
+                DateTime finishTime = DateTime.Now;
+                string finish = finishTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
+                DateTime devTime;
+                string devTimeString = timing[2];
+                DateTime.TryParseExact(devTimeString, "yyyy-MM-dd HH:mm:ss:fffff", null, System.Globalization.DateTimeStyles.None, out devTime);
+                TimeSpan elapsedTime = finishTime - startTime;
+                //file.WriteLine("{0},{1},{2}", commandReceived, finish, elapsedTime.TotalMilliseconds);
+                //file.FlushAsync();
+
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = @"
+                INSERT dbo.PerfLogs (DeviceID, ServiceSendTime, DeviceTime, IoTHubReceiveTime, ServiceReceiveTime, ElapsedTime, TimeOut, Success, ServiceSDKversion, DeviceSDKversion, InstanceStartTime, Description)
+                VALUES (@DeviceID, @ServiceSendTime, @DeviceTime, @IoTHubReceiveTime, @ServiceReceiveTime, @ElapsedTime, @TimeOut, @Success, @ServiceSDKversion, @DeviceSDKversion, @InstanceStartTime, @Description)";
+
+                cmd.Parameters.AddWithValue("@DeviceID", deviceId);
+                cmd.Parameters.AddWithValue("@ServiceSendTime", startTime.ToUniversalTime());
+                cmd.Parameters.AddWithValue("@ServiceReceiveTime", finishTime.ToUniversalTime());
+                cmd.Parameters.AddWithValue("@ElapsedTime", elapsedTime.TotalMilliseconds);
+                cmd.Parameters.AddWithValue("@TimeOut", 30000);
+                cmd.Parameters.AddWithValue("@Success", 1);
+                cmd.Parameters.AddWithValue("@ServiceSDKversion", svcSDKver);
+                cmd.Parameters.AddWithValue("@DeviceSDKversion", dvcSDKver);
+
+                cmd.Parameters.AddWithValue("@DeviceTime", devTime.ToUniversalTime());
+                cmd.Parameters.AddWithValue("@IoTHubReceiveTime", msg.enqueuedTime);
+
+                cmd.Parameters.AddWithValue("@InstanceStartTime", instanceTime.ToUniversalTime());
+
+                cmd.Parameters.AddWithValue("@Description", desc);
+
+
+                cmd.ExecuteScalar();
+
+
+                Console.WriteLine("Processed: {0},{1},{2}", msg.message, finish, elapsedTime.TotalMilliseconds);
+                startTimeString = "";
+                await SendCloudToDeviceMessageAsync();
+            }
+            else
+            {
+                if ((timeout < (DateTime.Now - startTime).TotalSeconds) && startTimeString != "")
+                {
+                    Console.WriteLine("TIMEOUT occurred");
+
+                    DateTime finishTime = DateTime.Now;
+                    string finish = finishTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
+
+                    var cmd = conn.CreateCommand();
+                    cmd.CommandText = @"
+                INSERT dbo.PerfLogs (DeviceID, ServiceSendTime, ServiceReceiveTime, TimeOut, Success, ServiceSDKversion, DeviceSDKversion, InstanceStartTime, Description)
+                VALUES (@DeviceID, @ServiceSendTime, @ServiceReceiveTime, @TimeOut, @Success, @ServiceSDKversion, @DeviceSDKversion, @InstanceStartTime, @Description)";
+
+                    cmd.Parameters.AddWithValue("@DeviceID", deviceId);
+                    cmd.Parameters.AddWithValue("@ServiceSendTime", startTime.ToUniversalTime());
+                    cmd.Parameters.AddWithValue("@ServiceReceiveTime", finishTime.ToUniversalTime());
+                    //cmd.Parameters.AddWithValue("@ElapsedTime", elapsedTime.TotalMilliseconds);
+                    cmd.Parameters.AddWithValue("@TimeOut", timeout);
+                    cmd.Parameters.AddWithValue("@Success", 0);
+                    cmd.Parameters.AddWithValue("@ServiceSDKversion", svcSDKver);
+                    cmd.Parameters.AddWithValue("@DeviceSDKversion", dvcSDKver);
+
+                    //cmd.Parameters.AddWithValue("@DeviceTime", devTime);
+                    //cmd.Parameters.AddWithValue("@IoTHubReceiveTime", commandReceivedTime);
+
+                    cmd.Parameters.AddWithValue("@InstanceStartTime", instanceTime.ToUniversalTime());
+
+                    cmd.Parameters.AddWithValue("@Description", desc);
+
+
+                    cmd.ExecuteScalar();
+                    startTimeString = "";
+                    await SendCloudToDeviceMessageAsync();
+
+                }
+                else
+                {
+                    Console.WriteLine("NOT PROCESSED: the message is not for this service!");
+                }
             }
         }
         private async static void ReceiveFeedbackAsync()
@@ -241,6 +260,20 @@ namespace IoTConsole
 
                 await feedbackReceiver.CompleteAsync(feedbackBatch);
             }
+        }
+        private async static Task AddDeviceAsync()
+        {
+            //string deviceId = "myFirstDevice4";
+            Device device;
+            try
+            {
+                device = await registryManager.AddDeviceAsync(new Device(deviceId));
+            }
+            catch (DeviceAlreadyExistsException)
+            {
+                device = await registryManager.GetDeviceAsync(deviceId);
+            }
+            Console.WriteLine("Generated device key: {0}", device.Authentication.SymmetricKey.PrimaryKey);
         }
     }
 }
