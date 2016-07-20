@@ -60,11 +60,13 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="PerfLogs.sql" />
+    <Build Include="IoTDemo.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database1.refactorlog" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Script1.sql" />
+    <None Include="ASA.sql" />
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using Microsoft.Azure.Devices.Client;
 using Newtonsoft.Json;
@@ -11,36 +12,59 @@ using System.Threading;
 using Microsoft.Azure.Devices;
 using Microsoft.Azure.Devices.Common.Exceptions;
 
+using System.Runtime.Serialization;
+
 namespace IoTDevices
 {
+
     class Program
     {
+     
+
         static DeviceClient deviceClient;
         static string iotHubUri = "juleedemo.azure-devices.net";
         //static string deviceKey = "rDSDirCgGmtZB0BSqW7fGUWaM2m3SRqBh81Csgc0leU=";
 
         // for add devices
         static RegistryManager registryManager;
-        static string connectionString = "HostName=juleedemo.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=UyRlyfGxaAWHs5c8LFvzDSaYWB8liQaW4stcynxWo5s=";
+        static string connectionString = "HostName=juleedemo.azure-devices.net;DeviceId=java;SharedAccessKey=jstNFhvprAs+Nr8HYbl9GV2YprEvyF7W2WyLKUdr5YQ=";
 
 
         static void Main(string[] args)
         {
-            string mode;
-            Console.Write("Type this device ID:");
+
+            Trace.Listeners.Add(new TextWriterTraceListener("device.log"));
+            Trace.AutoFlush = true;
+
+            string deviceId="";
+            Console.Write("Enter Device Connection String for this device:");
+            connectionString = Console.ReadLine();
+            //HostName = juleedemo.azure - devices.net; DeviceId = java; SharedAccessKey = jstNFhvprAs + Nr8HYbl9GV2YprEvyF7W2WyLKUdr5YQ =
+
+            var components = connectionString.Split(';');
+            var blocks = components.Select(component => component.Split('='));
+            foreach (var block in blocks)
+            {
+                string key = block[0].Replace(" ", string.Empty);
+                string value = block[1].Replace(" ", string.Empty);
+                if (key == "DeviceId")
+                    deviceId = value;
+                    
+            }
             //string deviceId=Console.ReadLine();
-            string deviceId = ".net";
+            //string deviceId = ".net";
 
             //Add or get deviceKey
-            registryManager = RegistryManager.CreateFromConnectionString(connectionString);
-            Task<string> task = AddmyDeviceAsync(deviceId);
-            string deviceKey = task.Result;
+            //registryManager = RegistryManager.CreateFromConnectionString(connectionString);
+            //Task<string> task = AddmyDeviceAsync(deviceId);
+            //string deviceKey = task.Result;
 
 
             //Console.WriteLine("choose mode of devices: 1 to send telemetry 2 to get commands");
             //mode=Console.ReadLine();
 
-            deviceClient = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(deviceId, deviceKey));
+            deviceClient = DeviceClient.CreateFromConnectionString(connectionString);
+            
             //deviceClient = DeviceClient.CreateFromConnectionString("HostName=IoT-julee.azure-devices.net;DeviceId=javaclient;SharedAccessKey=dKwsHSWDJA3Gy4wZqG+TQ36dVt1cfAgvl4B/LCz+PG0=");
             //deviceClient.OpenAsync();
             //if (mode == "1")
@@ -51,10 +75,72 @@ namespace IoTDevices
             //}
             //else
             //{
-                ReceiveC2dAsync();
+                ReceiveC2dAsync(deviceId);
             //}
             //Console.WriteLine("Program exit. Type Enter.");
             Console.ReadLine();
+        }
+
+
+
+        private static async void ReceiveC2dAsync(string deviceid)
+        {
+            Console.WriteLine("\nReceiving cloud to device messages from service");
+            while (true)
+            {
+                Microsoft.Azure.Devices.Client.Message receivedMessage;
+                try
+                {
+                    receivedMessage = await deviceClient.ReceiveAsync();
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("{0}:{1}", DateTime.Now, e.Message);
+                    Trace.TraceError("{0}:{1}", DateTime.Now, e.Message);
+                    continue;
+                }
+                
+                if (receivedMessage == null)
+                {
+                    //ReceiveAsync가 timeout이 있는 듯 나중에 체크할 것
+                    Console.WriteLine("{0}: no message", DateTime.Now);
+                    Trace.TraceInformation("{0}: no message", DateTime.Now);
+                    continue;
+                }
+
+
+
+                string serviceMessage = Encoding.ASCII.GetString(receivedMessage.GetBytes());
+
+                Console.WriteLine("RECEIVED: {0}", DateTime.Now);
+                Trace.TraceInformation("RECEIVED: {0}", DateTime.Now);
+
+                try
+                {
+                    //var messagestring = serviceMessage + "," + DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
+                    var telemetrydatapoint = new { DeviceID = deviceid, StartTime = serviceMessage, DeviceTime = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffZ") };
+                    var messagestring = JsonConvert.SerializeObject(telemetrydatapoint);
+                    var message = new Microsoft.Azure.Devices.Client.Message(Encoding.ASCII.GetBytes(messagestring));
+                    await deviceClient.SendEventAsync(message);
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Message Sent: {0}", messagestring);
+                    Trace.TraceInformation("Message Sent: {0}", messagestring);
+                    Console.ResetColor();
+
+                    await deviceClient.CompleteAsync(receivedMessage);
+                }
+                catch (Exception exception)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("{0} > Exception: {1}", DateTime.Now, exception.Message);
+                    Trace.TraceError("{0} > Exception: {1}", DateTime.Now, exception.Message);
+                    Console.ResetColor();
+                }
+
+
+
+            }
         }
         private static async void SendDeviceToCloudMessagesAsync(string deviceId)
         {
@@ -90,49 +176,7 @@ namespace IoTDevices
 
 
         }
-        private static async void ReceiveC2dAsync()
-        {
-            Console.WriteLine("\nReceiving cloud to device messages from service");
-            while (true)
-            {
-                Microsoft.Azure.Devices.Client.Message receivedMessage = await deviceClient.ReceiveAsync();
-                if (receivedMessage == null) {
-                    //ReceiveAsync가 timeout이 있는 듯 나중에 체크할 것
-                    Console.WriteLine("{0}: no message",DateTime.Now);
-                    continue;
-                }
-                
-                
 
-                string serviceMessage = Encoding.ASCII.GetString(receivedMessage.GetBytes());
-
-                Console.WriteLine("RECEIVED: {0}", DateTime.Now);
-
-                try
-                {
-                    var messagestring = serviceMessage + "," + DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
-                    //var telemetrydatapoint = new { StartTime = serviceMessage, DeviceTime = DateTime.Now.ToString() };
-                    //var messagestring = JsonConvert.SerializeObject(telemetrydatapoint);
-                    var message = new Microsoft.Azure.Devices.Client.Message(Encoding.ASCII.GetBytes(messagestring));
-                    await deviceClient.SendEventAsync(message);
-
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("Message Sent: {0}", messagestring);
-                    Console.ResetColor();
-
-                    await deviceClient.CompleteAsync(receivedMessage);
-                }
-                catch (Exception exception)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("{0} > Exception: {1}", DateTime.Now, exception.Message);
-                    Console.ResetColor();
-                }               
-                
-                
-                                
-            }
-        }
         private async static Task<string> AddmyDeviceAsync(string deviceId)
         {
             //string deviceId = "myFirstDevice4";

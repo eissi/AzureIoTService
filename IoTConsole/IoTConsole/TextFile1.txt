@@ -1,0 +1,249 @@
+﻿Starting...
+Beginning setup.
+Successfully read input parameters.
+Using communication protocol AMQPS_WS.
+Successfully created an IoT Hub client.
+Successfully set message callback.
+4월 02, 2016 1:49:34 오후 org.apache.qpid.proton.engine.impl.ssl.SslEngineFacadeFactory getClass
+경고: unable to load org.bouncycastle.openssl.PEMReader
+4월 02, 2016 1:49:34 오후 org.apache.qpid.proton.engine.impl.ssl.SslEngineFacadeFactory getClass
+경고: unable to load org.bouncycastle.openssl.PasswordFinder
+4월 02, 2016 1:49:34 오후 org.apache.qpid.proton.engine.impl.ssl.SslEngineFacadeFactory <clinit>
+경고: unable to load bouncycastle provider
+Opened connection to IoT Hub.
+Beginning to receive messages...
+Press any key to exit...
+Received message at 2016-04-02 04:49:35:00096 with content: java,2016-04-02 04:40:43:43401
+[Recv Test] Received message with content: java,2016-04-02 04:40:43:43401 -> My ReceivedTime : [2016-04-02] 13:49:35.096
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:35.096
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:35:00111 with content: 2016-04-02 04:40:43:43401
+[Recv Test] Received message with content: 2016-04-02 04:40:43:43401 -> My ReceivedTime : [2016-04-02] 13:49:35.111
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:35.111
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:35:00127 with content: 2016-04-02 04:40:43:43401
+[Recv Test] Received message with content: 2016-04-02 04:40:43:43401 -> My ReceivedTime : [2016-04-02] 13:49:35.127
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:35.127
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:35:00705 with content: java,2016-04-02 04:49:35:62738
+[Recv Test] Received message with content: java,2016-04-02 04:49:35:62738 -> My ReceivedTime : [2016-04-02] 13:49:35.705
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:35.705
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:36:00283 with content: java,2016-04-02 04:49:36:20560
+[Recv Test] Received message with content: java,2016-04-02 04:49:36:20560 -> My ReceivedTime : [2016-04-02] 13:49:36.283
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:36.284
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:36:00770 with content: java,2016-04-02 04:49:36:61465
+[Recv Test] Received message with content: java,2016-04-02 04:49:36:61465 -> My ReceivedTime : [2016-04-02] 13:49:36.770
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:36.770
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:37:00349 with content: java,2016-04-02 04:49:37:27098
+[Recv Test] Received message with content: java,2016-04-02 04:49:37:27098 -> My ReceivedTime : [2016-04-02] 13:49:37.349
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:37.349
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:37:00882 with content: java,2016-04-02 04:49:37:80418
+[Recv Test] Received message with content: java,2016-04-02 04:49:37:80418 -> My ReceivedTime : [2016-04-02] 13:49:37.882
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:37.882
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:38:00272 with content: java,2016-04-02 04:49:38:19485
+[Recv Test] Received message with content: java,2016-04-02 04:49:38:19485 -> My ReceivedTime : [2016-04-02] 13:49:38.272
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:38.272
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:38:00932 with content: java,2016-04-02 04:49:38:83917
+[Recv Test] Received message with content: java,2016-04-02 04:49:38:83917 -> My ReceivedTime : [2016-04-02] 13:49:38.934
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:38.934
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:39:00544 with content: java,2016-04-02 04:49:39:43522
+[Recv Test] Received message with content: java,2016-04-02 04:49:39:43522 -> My ReceivedTime : [2016-04-02] 13:49:39.544
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:39.544
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:40:00154 with content: java,2016-04-02 04:49:40:07591
+[Recv Test] Received message with content: java,2016-04-02 04:49:40:07591 -> My ReceivedTime : [2016-04-02] 13:49:40.154
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:40.154
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:40:00859 with content: java,2016-04-02 04:49:40:78088
+[Recv Test] Received message with content: java,2016-04-02 04:49:40:78088 -> My ReceivedTime : [2016-04-02] 13:49:40.859
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:40.859
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:41:00296 with content: java,2016-04-02 04:49:41:23405
+[Recv Test] Received message with content: java,2016-04-02 04:49:41:23405 -> My ReceivedTime : [2016-04-02] 13:49:41.296
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:41.297
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:41:00939 with content: java,2016-04-02 04:49:41:86104
+[Recv Test] Received message with content: java,2016-04-02 04:49:41:86104 -> My ReceivedTime : [2016-04-02] 13:49:41.939
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:41.939
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:42:00517 with content: java,2016-04-02 04:49:42:34543
+[Recv Test] Received message with content: java,2016-04-02 04:49:42:34543 -> My ReceivedTime : [2016-04-02] 13:49:42.517
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:42.522
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:43:00022 with content: java,2016-04-02 04:49:42:92837
+[Recv Test] Received message with content: java,2016-04-02 04:49:42:92837 -> My ReceivedTime : [2016-04-02] 13:49:43.022
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:43.022
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:43:00397 with content: java,2016-04-02 04:49:43:33466
+[Recv Test] Received message with content: java,2016-04-02 04:49:43:33466 -> My ReceivedTime : [2016-04-02] 13:49:43.397
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:43.397
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:43:00772 with content: java,2016-04-02 04:49:43:69408
+[Recv Test] Received message with content: java,2016-04-02 04:49:43:69408 -> My ReceivedTime : [2016-04-02] 13:49:43.772
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:43.772
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:44:00211 with content: java,2016-04-02 04:49:44:13324
+[Recv Test] Received message with content: java,2016-04-02 04:49:44:13324 -> My ReceivedTime : [2016-04-02] 13:49:44.211
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:44.211
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:44:00773 with content: java,2016-04-02 04:49:44:71143
+[Recv Test] Received message with content: java,2016-04-02 04:49:44:71143 -> My ReceivedTime : [2016-04-02] 13:49:44.773
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:44.774
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:46:00281 with content: java,2016-04-02 04:49:46:20351
+[Recv Test] Received message with content: java,2016-04-02 04:49:46:20351 -> My ReceivedTime : [2016-04-02] 13:49:46.281
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:46.282
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:46:00705 with content: java,2016-04-02 04:49:46:62705
+[Recv Test] Received message with content: java,2016-04-02 04:49:46:62705 -> My ReceivedTime : [2016-04-02] 13:49:46.705
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:46.705
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:47:00142 with content: java,2016-04-02 04:49:47:06459
+[Recv Test] Received message with content: java,2016-04-02 04:49:47:06459 -> My ReceivedTime : [2016-04-02] 13:49:47.142
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:47.142
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:47:00658 with content: java,2016-04-02 04:49:47:54902
+[Recv Test] Received message with content: java,2016-04-02 04:49:47:54902 -> My ReceivedTime : [2016-04-02] 13:49:47.658
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:47.659
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:48:00101 with content: java,2016-04-02 04:49:47:99190
+[Recv Test] Received message with content: java,2016-04-02 04:49:47:99190 -> My ReceivedTime : [2016-04-02] 13:49:48.101
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:48.101
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:48:00491 with content: java,2016-04-02 04:49:48:41382
+[Recv Test] Received message with content: java,2016-04-02 04:49:48:41382 -> My ReceivedTime : [2016-04-02] 13:49:48.491
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:48.491
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:48:00898 with content: java,2016-04-02 04:49:48:82012
+[Recv Test] Received message with content: java,2016-04-02 04:49:48:82012 -> My ReceivedTime : [2016-04-02] 13:49:48.898
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:48.898
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:49:00337 with content: java,2016-04-02 04:49:49:25930
+[Recv Test] Received message with content: java,2016-04-02 04:49:49:25930 -> My ReceivedTime : [2016-04-02] 13:49:49.337
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:49.337
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:50:00009 with content: java,2016-04-02 04:49:49:93128
+[Recv Test] Received message with content: java,2016-04-02 04:49:49:93128 -> My ReceivedTime : [2016-04-02] 13:49:50.009
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:50.009
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:50:00432 with content: java,2016-04-02 04:49:50:37037
+[Recv Test] Received message with content: java,2016-04-02 04:49:50:37037 -> My ReceivedTime : [2016-04-02] 13:49:50.432
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:50.432
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:50:00901 with content: java,2016-04-02 04:49:50:82354
+[Recv Test] Received message with content: java,2016-04-02 04:49:50:82354 -> My ReceivedTime : [2016-04-02] 13:49:50.901
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:50.901
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:51:00401 with content: java,2016-04-02 04:49:51:29234
+[Recv Test] Received message with content: java,2016-04-02 04:49:51:29234 -> My ReceivedTime : [2016-04-02] 13:49:51.401
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:51.402
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:51:00997 with content: java,2016-04-02 04:49:51:80975
+[Recv Test] Received message with content: java,2016-04-02 04:49:51:80975 -> My ReceivedTime : [2016-04-02] 13:49:51.997
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:51.997
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:52:00966 with content: java,2016-04-02 04:49:52:37231
+[Recv Test] Received message with content: java,2016-04-02 04:49:52:37231 -> My ReceivedTime : [2016-04-02] 13:49:52.966
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:52.966
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:53:00783 with content: java,2016-04-02 04:49:53:60839
+[Recv Test] Received message with content: java,2016-04-02 04:49:53:60839 -> My ReceivedTime : [2016-04-02] 13:49:53.783
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:53.783
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:54:00283 with content: java,2016-04-02 04:49:54:18948
+[Recv Test] Received message with content: java,2016-04-02 04:49:54:18948 -> My ReceivedTime : [2016-04-02] 13:49:54.283
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:54.283
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:54:00800 with content: java,2016-04-02 04:49:54:72234
+[Recv Test] Received message with content: java,2016-04-02 04:49:54:72234 -> My ReceivedTime : [2016-04-02] 13:49:54.800
+[Recv Test] MessageCallback execute() Ended! = 13 / [2016-04-02] 13:49:54.800
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
+Received message at 2016-04-02 04:49:55:00159 with content: java,2016-04-02 04:49:55:09738
+[Recv Test] Received message with content: java,2016-04-02 04:49:55:09738 -> My ReceivedTime : [2016-04-02] 13:49:55.159
+[Recv Test] MessageCallback execute() Ended! = 14 / [2016-04-02] 13:49:55.159
+[Recv Test] End ---------------------------------------------------- 
+
+Responding to message  with COMPLETE
