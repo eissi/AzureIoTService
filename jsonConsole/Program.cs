@@ -30,6 +30,10 @@ namespace IoTConsole
         static ServiceClient serviceClient;
         static string serviceConnectionString = "HostName=julee.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=HGCjNhb8Wy6b4EYxiuz4poOU14ij8Bpf0UHZDmz/LpA=";
 
+        //for operations monitoring
+        static string operConnectionString = serviceConnectionString;
+        static string operEndpoint = "messages/operationsmonitoringevents";
+        static EventHubClient operHubClient;
 
         //receive용 test
         static string eventhubconnectionString = serviceConnectionString;
@@ -68,9 +72,18 @@ namespace IoTConsole
             Console.WriteLine("Start to send Cloud-to-Device message\n");
             serviceClient = ServiceClient.CreateFromConnectionString(serviceConnectionString);
 
-            ReceiveFeedbackAsync();
 
 
+            //you have to enable flag when sending message
+            //ReceiveFeedbackAsync();
+
+            //operations monitoring 
+            //operHubClient = EventHubClient.CreateFromConnectionString(operConnectionString, operEndpoint);
+            //var operPartitions = operHubClient.GetRuntimeInformation().PartitionIds;
+            //foreach (string partition in operPartitions)
+            //{
+            //    ReceiveMessagesFromMonitorAsync(partition);
+            //}
 
             Console.Write("Enter the device ID:");
             deviceId = Console.ReadLine();
@@ -134,7 +147,7 @@ namespace IoTConsole
         private async static Task SendCloudToDeviceMessageAsync()
         {
 
-            Thread.Sleep(3000);
+            //Thread.Sleep(3000);
 
             //Trace.TraceInformation("SENT ROUTINE STARTED.");
             //bool commandProcessed = false;
@@ -164,6 +177,43 @@ namespace IoTConsole
             Trace.TraceInformation("SENT:{1}: {0}", startTimeString, DateTime.Now);
             Console.WriteLine("SENT{1}: {0}", startTimeString, DateTime.Now);
             //sent = true;
+        }
+
+    
+        private async static Task ReceiveMessagesFromMonitorAsync(string partition)
+        {
+            var eventHubReceiver = operHubClient.GetDefaultConsumerGroup().CreateReceiver(partition, DateTime.Now);
+            while (true)
+            {
+                EventData eventData = null;
+                try
+                {
+                    eventData = await eventHubReceiver.ReceiveAsync();
+                    Trace.TraceInformation("RAW MONITOR RECEIVED:{1}: {0}", Encoding.UTF8.GetString(eventData.GetBytes()), DateTime.Now);
+                    Console.WriteLine("RAW MONITOR RECEIVED:{1}: {0}", Encoding.UTF8.GetString(eventData.GetBytes()), DateTime.Now);
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceWarning("{0}:TIMEOUT at MONITOR occurred", DateTime.Now);
+                    Console.WriteLine("{0}:TIMEOUT at MONITOR occurred", DateTime.Now);
+
+
+                }
+
+                if (eventData == null) continue;
+
+
+                IoTHubMessage msg = new IoTHubMessage();
+                msg.enqueuedTime = eventData.EnqueuedTimeUtc;
+                msg.message = Encoding.UTF8.GetString(eventData.GetBytes());
+                //Trace.TraceInformation("RECEIVED: {0}", msg.message);
+                //Console.WriteLine("RECEIVED: {0}", msg.message);
+
+                ProcessMonitorMessageAsync(msg);
+
+
+            }
+
         }
         private async static Task ReceiveMessagesFromDeviceAsync(string partition)
         {
@@ -239,7 +289,16 @@ namespace IoTConsole
         }
 
         class jsonmessage { public string DeviceID; public string StartTime; public string DeviceTime; };
+        class monitormessage { public string duratinoMs; public string authType; public string time; public string operationName; public string category; public string level; public string statusCode; public string statusType; public string statusDescription; public string deviceId; };
+        static async void ProcessMonitorMessageAsync(IoTHubMessage msg)
+        {
+            monitormessage monitor;
 
+            monitor = JsonConvert.DeserializeObject<monitormessage>(msg.message);
+            Trace.TraceInformation("{0}:MONITOR-> CATEGORY:{1}, OPERATION:{2}, DEVICEID:{3}", DateTime.Now, monitor.category, monitor.operationName, monitor.deviceId);
+            Console.WriteLine("{0}:MONITOR-> CATEGORY:{1}, OPERATION:{2}, DEVICEID:{3}", DateTime.Now, monitor.category, monitor.operationName, monitor.deviceId);
+
+        }
         static async void ProcessMessageAsync(IoTHubMessage msg)
         {
             //Console.WriteLine("Enter: Processing command received! - {0}", msg.message);

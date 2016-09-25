@@ -59,14 +59,17 @@
     <Folder Include="Properties" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="PerfLogs.sql" />
+    <Build Include="create-PerfLogs.sql" />
     <Build Include="IoTDemo.sql" />
+    <Build Include="proc-insert.sql" />
+    <Build Include="proc-elapsedtime.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database1.refactorlog" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Script1.sql" />
+    <None Include="query-iotperf.sql" />
     <None Include="ASA.sql" />
+    <None Include="query-general.sql" />
   </ItemGroup>
 </Project>
