@@ -12,6 +12,7 @@
     [DeviceSDKversion]   NVARCHAR (50) NULL,
     [InstanceStartTime] DATETIME NULL, 
     [Description] NVARCHAR(100) NULL, 
+	[LogCreatedTime] DATETIME2 NOT NULL DEFAULT GETDATE(), 
     PRIMARY KEY CLUSTERED ([Id] ASC)
 );
 

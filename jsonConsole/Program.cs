@@ -133,10 +133,13 @@ namespace IoTConsole
 
         private async static Task SendCloudToDeviceMessageAsync()
         {
+
+            Thread.Sleep(3000);
+
             //Trace.TraceInformation("SENT ROUTINE STARTED.");
             //bool commandProcessed = false;
             startTime = DateTime.Now;
-            startTimeString = startTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
+            startTimeString = startTime.ToUniversalTime().ToString("O");
             var commandMessage = new Message(Encoding.ASCII.GetBytes(startTimeString));
             commandMessage.Ack = DeliveryAcknowledgement.Full;
             //Trace.TraceInformation("Before while");
@@ -253,10 +256,10 @@ namespace IoTConsole
                 //sent = false;
 
                 DateTime finishTime = DateTime.Now;
-                string finish = finishTime.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
+                string finish = finishTime.ToUniversalTime().ToString("O");
                 DateTime devTime;
                 string devTimeString = timing.DeviceTime;
-                DateTime.TryParseExact(devTimeString, "yyyy-MM-dd HH:mm:ss:fffff", null, System.Globalization.DateTimeStyles.None, out devTime);
+                DateTime.TryParseExact(devTimeString, "O", null, System.Globalization.DateTimeStyles.None, out devTime);
                 TimeSpan elapsedTime = finishTime - startTime;
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Elapsed Time:{1}:{0}", elapsedTime, ++messageCount);

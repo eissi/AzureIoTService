@@ -104,7 +104,7 @@ namespace IoTDevices
                 try
                 {
                     //var messagestring = serviceMessage + "," + DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff");
-                    var telemetrydatapoint = new { DeviceID = deviceid, StartTime = serviceMessage, DeviceTime = DateTime.Now.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss:fffff") };
+                    var telemetrydatapoint = new { DeviceID = deviceid, StartTime = serviceMessage, DeviceTime = DateTime.Now.ToUniversalTime().ToString("O") };
                     var messagestring = JsonConvert.SerializeObject(telemetrydatapoint);
                     var message = new Microsoft.Azure.Devices.Client.Message(Encoding.ASCII.GetBytes(messagestring));
                     await deviceClient.SendEventAsync(message);
