@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoTConsole", "IoTConsole\IoTConsole.csproj", "{1B99277F-95C4-4FC3-AE94-3494D5F6554A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoTConsole-oldgit", "IoTConsole\IoTConsole-oldgit.csproj", "{1B99277F-95C4-4FC3-AE94-3494D5F6554A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoTDevices", "..\IoTDevices\IoTDevices\IoTDevices.csproj", "{D60D9E8D-D4B0-4DC4-97DB-CC6247BF4056}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoTDevices-oldgit", "..\IoTDevices\IoTDevices\IoTDevices-oldgit.csproj", "{D60D9E8D-D4B0-4DC4-97DB-CC6247BF4056}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database1", "Database1\Database1.sqlproj", "{2A9C386A-156B-4DA8-8A4A-38DF97E03A4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jsonConsole", "..\jsonConsole\jsonConsole.csproj", "{398C0567-9236-45FA-AAC2-A01A60466AFA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jsonDevice", "..\jsonDevice\jsonDevice.csproj", "{01B5A06A-26E6-48AF-BB39-CE6E1A20DAE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +33,14 @@ Global
 		{2A9C386A-156B-4DA8-8A4A-38DF97E03A4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A9C386A-156B-4DA8-8A4A-38DF97E03A4B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2A9C386A-156B-4DA8-8A4A-38DF97E03A4B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{398C0567-9236-45FA-AAC2-A01A60466AFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398C0567-9236-45FA-AAC2-A01A60466AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398C0567-9236-45FA-AAC2-A01A60466AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398C0567-9236-45FA-AAC2-A01A60466AFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01B5A06A-26E6-48AF-BB39-CE6E1A20DAE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01B5A06A-26E6-48AF-BB39-CE6E1A20DAE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01B5A06A-26E6-48AF-BB39-CE6E1A20DAE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01B5A06A-26E6-48AF-BB39-CE6E1A20DAE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
