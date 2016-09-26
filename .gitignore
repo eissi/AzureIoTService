@@ -279,3 +279,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/IoTConsole/Database1/Database1.jfm
