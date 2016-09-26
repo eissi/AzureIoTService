@@ -61,7 +61,7 @@ namespace IoTConsole
 
             instanceTime = DateTime.Now;
 
-            conn = new SqlConnection("Server=tcp:julee.database.windows.net,1433;Initial Catalog=iot;Persist Security Info=False;User ID=julee;Password=Passw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+            conn = new SqlConnection("Server=tcp:juleeasia.database.windows.net,1433;Initial Catalog=iotdb;Persist Security Info=False;User ID=julee;Password=Passw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             conn.Open();
 
             dvcSDKver = ".Net 1.0.2";
