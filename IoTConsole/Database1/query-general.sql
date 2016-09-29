@@ -24,9 +24,11 @@ select
 	group by Description
 
 select datediff(second,min(logcreatedtime),max(logcreatedtime)) from PerfLogs where deviceid='demo3'
-select count(logcreatedtime) from PerfLogs where deviceid='demo3'
+select count(logcreatedtime) from PerfLogs where deviceid='su1'
 select count(logcreatedtime)/datediff(second,min(logcreatedtime),max(logcreatedtime)) as [trans per sec] from PerfLogs where deviceid='demo3'
 
 delete from PerfLogs where description='insert test'
 
 select distinct description from PerfLogs
+
+select * from PerfLogs where deviceid='su1'
