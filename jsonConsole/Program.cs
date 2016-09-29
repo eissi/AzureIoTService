@@ -26,9 +26,9 @@ namespace IoTConsole
     class Program
     {
         static RegistryManager registryManager;
-        static string connectionString = "HostName=julees1.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=TMIzVSL6aaDQanhIg0nb3Bss82FLg4ckKVlRDlUDvwE=";
+        static string connectionString = "HostName=julee.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=/S/FvvslVBY506w2P/LVhWkFe5hBHpokLWacSelrVO4=";
         static ServiceClient serviceClient;
-        static string serviceConnectionString = "HostName=julees1.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=p4fkBr0y5ps0DsmaWCbqbNylHN9qfMaEauRHwjYV8jI=";
+        static string serviceConnectionString = "HostName=julee.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=HGCjNhb8Wy6b4EYxiuz4poOU14ij8Bpf0UHZDmz/LpA=";
 
         //for operations monitoring
         static string operConnectionString = serviceConnectionString;
@@ -349,7 +349,7 @@ namespace IoTConsole
 
                 try
                 {
-                    cmd.ExecuteScalar();
+                    //cmd.ExecuteScalar();
                 }
                 catch (Exception e)
                 {

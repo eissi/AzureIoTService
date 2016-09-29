@@ -19,15 +19,15 @@ namespace IoTDevices
 
     class Program
     {
-     
+
 
         static DeviceClient deviceClient;
-        static string iotHubUri = "juleedemo.azure-devices.net";
+        static string iotHubUri = "julee.azure-devices.net";
         //static string deviceKey = "rDSDirCgGmtZB0BSqW7fGUWaM2m3SRqBh81Csgc0leU=";
 
         // for add devices
         static RegistryManager registryManager;
-        static string connectionString = "HostName=juleedemo.azure-devices.net;DeviceId=java;SharedAccessKey=jstNFhvprAs+Nr8HYbl9GV2YprEvyF7W2WyLKUdr5YQ=";
+        static string connectionString = "HostName=julee.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=/S/FvvslVBY506w2P/LVhWkFe5hBHpokLWacSelrVO4=";
 
 
         static void Main(string[] args)
@@ -36,21 +36,34 @@ namespace IoTDevices
             Trace.Listeners.Add(new TextWriterTraceListener("device.log"));
             Trace.AutoFlush = true;
 
-            string deviceId="";
-            Console.Write("Enter Device Connection String for this device:");
-            connectionString = Console.ReadLine();
-            //HostName = juleedemo.azure - devices.net; DeviceId = java; SharedAccessKey = jstNFhvprAs + Nr8HYbl9GV2YprEvyF7W2WyLKUdr5YQ =
 
-            var components = connectionString.Split(';');
-            var blocks = components.Select(component => component.Split('='));
-            foreach (var block in blocks)
-            {
-                string key = block[0].Replace(" ", string.Empty);
-                string value = block[1].Replace(" ", string.Empty);
-                if (key == "DeviceId")
-                    deviceId = value;
-                    
-            }
+            string mode;
+            Console.Write("Type this device ID:");
+            string deviceId = Console.ReadLine();
+            //string deviceId = ".net";
+
+            //Add or get deviceKey
+            registryManager = RegistryManager.CreateFromConnectionString(connectionString);
+            Task<string> task = AddmyDeviceAsync(deviceId);
+            string deviceKey = task.Result;
+
+            deviceClient = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(deviceId, deviceKey), (Microsoft.Azure.Devices.Client.TransportType)2);
+
+            //string deviceId="";
+            //Console.Write("Enter Device Connection String for this device:");
+            //connectionString = Console.ReadLine();
+            ////HostName = juleedemo.azure - devices.net; DeviceId = java; SharedAccessKey = jstNFhvprAs + Nr8HYbl9GV2YprEvyF7W2WyLKUdr5YQ =
+
+            //var components = connectionString.Split(';');
+            //var blocks = components.Select(component => component.Split('='));
+            //foreach (var block in blocks)
+            //{
+            //    string key = block[0].Replace(" ", string.Empty);
+            //    string value = block[1].Replace(" ", string.Empty);
+            //    if (key == "DeviceId")
+            //        deviceId = value;
+
+            //}
             //string deviceId=Console.ReadLine();
             //string deviceId = ".net";
 
@@ -63,7 +76,7 @@ namespace IoTDevices
             //Console.WriteLine("choose mode of devices: 1 to send telemetry 2 to get commands");
             //mode=Console.ReadLine();
 
-            deviceClient = DeviceClient.CreateFromConnectionString(connectionString);
+            //deviceClient = DeviceClient.CreateFromConnectionString(connectionString);
             
             //deviceClient = DeviceClient.CreateFromConnectionString("HostName=IoT-julee.azure-devices.net;DeviceId=javaclient;SharedAccessKey=dKwsHSWDJA3Gy4wZqG+TQ36dVt1cfAgvl4B/LCz+PG0=");
             //deviceClient.OpenAsync();
@@ -71,11 +84,11 @@ namespace IoTDevices
             //{
             //    Console.WriteLine("Simulated device\n");
                 
-            //    SendDeviceToCloudMessagesAsync(deviceId);
+                SendDeviceToCloudMessagesAsync(deviceId);
             //}
             //else
             //{
-                ReceiveC2dAsync(deviceId);
+                //ReceiveC2dAsync(deviceId);
             //}
             //Console.WriteLine("Program exit. Type Enter.");
             Console.ReadLine();
@@ -144,19 +157,19 @@ namespace IoTDevices
         }
         private static async void SendDeviceToCloudMessagesAsync(string deviceId)
         {
-            double avgWindSpeed = 10; // m/s
-            Random rand = new Random();
+            //double avgWindSpeed = 10; // m/s
+            //Random rand = new Random();
 
-            var devPerf = new DevicePerformance();
+            //var devPerf = new DevicePerformance();
 
             while (true)
             {
                 try
                 {
-                    devPerf.set_cpuvalue();
-                    devPerf.set_memvalue();
+                    //devPerf.set_cpuvalue();
+                    //devPerf.set_memvalue();
 
-                    var telemetrydatapoint = new { deviceid = deviceId, CPUusage = devPerf.cpuusage, MEMusage = devPerf.memusage };
+                    var telemetrydatapoint = new { deviceid = deviceId, Time=DateTime.Now};
                     var messagestring = JsonConvert.SerializeObject(telemetrydatapoint);
                     var message = new Microsoft.Azure.Devices.Client.Message(Encoding.ASCII.GetBytes(messagestring));
                     await deviceClient.SendEventAsync(message);
