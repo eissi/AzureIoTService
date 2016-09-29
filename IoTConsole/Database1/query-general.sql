@@ -18,10 +18,12 @@ select
 	min(ElapsedTime) as [min elapsed time(ms)],
 	max(elapsedtime) as [max elapsed time(ms)]
 	from PerfLogs 
-	where deviceid='demo' 
+	where deviceid='0928' 
 	group by Description
 
-select datediff(second,min(logcreatedtime),max(logcreatedtime)) from PerfLogs
+select datediff(second,min(logcreatedtime),max(logcreatedtime)) from PerfLogs where deviceid='demo3'
+select count(logcreatedtime) from PerfLogs where deviceid='demo3'
+select count(logcreatedtime)/datediff(second,min(logcreatedtime),max(logcreatedtime)) as [trans per sec] from PerfLogs where deviceid='demo3'
 
 delete from PerfLogs where description='insert test'
 
