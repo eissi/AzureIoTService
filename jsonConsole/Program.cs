@@ -147,7 +147,7 @@ namespace IoTConsole
         private async static Task SendCloudToDeviceMessageAsync()
         {
 
-            //Thread.Sleep(3000);
+            //Thread.Sleep(200);
 
             //Trace.TraceInformation("SENT ROUTINE STARTED.");
             //bool commandProcessed = false;
