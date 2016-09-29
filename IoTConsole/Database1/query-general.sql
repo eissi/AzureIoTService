@@ -31,4 +31,4 @@ delete from PerfLogs where description='insert test'
 
 select distinct description from PerfLogs
 
-select * from PerfLogs where deviceid='su1test2'
+select * from PerfLogs where deviceid='demo2'

@@ -224,8 +224,8 @@ namespace IoTConsole
                 try
                 {
                     eventData = await eventHubReceiver.ReceiveAsync(TimeSpan.FromSeconds(1));
-                    Trace.TraceInformation("RAW RECEIVED:{1}: {0}", Encoding.UTF8.GetString(eventData.GetBytes()), DateTime.Now);
-                    Console.WriteLine("RAW RECEIVED:{1}: {0}", Encoding.UTF8.GetString(eventData.GetBytes()), DateTime.Now);
+                    //Trace.TraceInformation("RAW RECEIVED:{1}: {0}", Encoding.UTF8.GetString(eventData.GetBytes()), DateTime.Now);
+                    //Console.WriteLine("RAW RECEIVED:{1}: {0}", Encoding.UTF8.GetString(eventData.GetBytes()), DateTime.Now);
                 }
                 catch (Exception e)
                 {
