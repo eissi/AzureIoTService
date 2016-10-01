@@ -26,9 +26,9 @@ namespace IoTConsole
     class Program
     {
         static RegistryManager registryManager;
-        static string connectionString = "HostName=julees1.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=TMIzVSL6aaDQanhIg0nb3Bss82FLg4ckKVlRDlUDvwE=";
+        static string connectionString = "HostName=julee32part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=8pcjgER2HvyEcV1B3JtOsXhIQHDaKBwHC23iedWOS7I=";
         static ServiceClient serviceClient;
-        static string serviceConnectionString = "HostName=julees1.azure-devices.net;SharedAccessKeyName=service;SharedAccessKey=p4fkBr0y5ps0DsmaWCbqbNylHN9qfMaEauRHwjYV8jI=";
+        static string serviceConnectionString = "HostName=julee32part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=8pcjgER2HvyEcV1B3JtOsXhIQHDaKBwHC23iedWOS7I=";
 
         //for operations monitoring
         static string operConnectionString = serviceConnectionString;
