@@ -6,7 +6,7 @@ select * from PerfLogs where datediff(SECOND,LogCreatedTime,getdate()) < 6500
 update PerfLogs
 set E2ETime=datediff(ms,ServiceSendTime,LogCreatedTime)
 where deviceid='su1round3'
-where datediff(SECOND,LogCreatedTime,getdate()) < 6500
+--where datediff(SECOND,LogCreatedTime,getdate()) < 6500
 
 select iothubreceivetime,logcreatedtime,ElapsedTime,description from PerfLogs where deviceid='demo' and Description='single_no_wait_no_window_on_ASA'
 select iothubreceivetime,logcreatedtime,ElapsedTime,description from PerfLogs where deviceid='demo' and Description='stream analytics'
@@ -31,4 +31,4 @@ delete from PerfLogs where description='insert test'
 
 select distinct description from PerfLogs
 
-select * from PerfLogs where deviceid='demo2'
+select * from PerfLogs order by id desc

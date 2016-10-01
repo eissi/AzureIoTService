@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,46 +23,80 @@ namespace IoTDevices
      
 
         static DeviceClient deviceClient;
-        static string iotHubUri = "julees1.azure-devices.net";
+        static string iotHubUri = "julee32part.azure-devices.net";
         //static string deviceKey = "rDSDirCgGmtZB0BSqW7fGUWaM2m3SRqBh81Csgc0leU=";
 
         // for add devices
         static RegistryManager registryManager;
-        static string connectionString = "HostName=julees1.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=TMIzVSL6aaDQanhIg0nb3Bss82FLg4ckKVlRDlUDvwE=";
+        static string connectionString = "HostName=julee32part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=8pcjgER2HvyEcV1B3JtOsXhIQHDaKBwHC23iedWOS7I=";
 
+        static DateTime instanceTime = DateTime.Now;
 
         static void Main(string[] args)
         {
+            string tracefile = System.Diagnostics.Process.GetCurrentProcess().ProcessName + "-" + DateTime.Now + ".log";
+            //Console.WriteLine(tracefile);
 
-            Trace.Listeners.Add(new TextWriterTraceListener("device.log"));
+            Trace.Listeners.Add(new TextWriterTraceListener(tracefile));
             Trace.AutoFlush = true;
 
-            string mode;
-            Console.Write("Type this device ID:");
-            string deviceId=Console.ReadLine();
+            //get number of devices
+            //Console.Write("Number of devices:");
+            //string deviceno = Console.ReadLine();
             //string deviceId = ".net";
+            int no_device=10;
+            Console.WriteLine("The number of devices to be simulated: {0}", no_device);
+            IEnumerable<Device> devices=null;
+            
 
-            //Add or get deviceKey
-            registryManager = RegistryManager.CreateFromConnectionString(connectionString);
-            Task<string> task = AddmyDeviceAsync(deviceId);
-            string deviceKey = task.Result;
+            //Check if the file exists for device keys
+            string device_json_file = "devices.json";
+            if (File.Exists(device_json_file))
+            {
+                //if exist, load device information
+                Console.WriteLine($"Find the file: {device_json_file}");
+                string jsoncontent = File.ReadAllText(device_json_file);
+                devices = JsonConvert.DeserializeObject<IEnumerable<Device>>(jsoncontent);
 
-       
-            //Console.WriteLine("choose mode of devices: 1 to send telemetry 2 to get commands");
-            //mode=Console.ReadLine();
+            }
+            //no file or if no enough devices, create, load and update the file
+            if (!File.Exists(device_json_file) || (devices == null) ||(devices.ToList<Device>().Count<no_device))
+            {
+                devices = Enumerable.Range(0, no_device)
+                .ToList().Select(x => "device" + x.ToString()).Select(x => new Device(x));
+                //if not, get from IoT Hub and write to file to re-load
 
-            deviceClient = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(deviceId, deviceKey),(Microsoft.Azure.Devices.Client.TransportType)2);
-            //deviceClient = DeviceClient.CreateFromConnectionString("HostName=IoT-julee.azure-devices.net;DeviceId=javaclient;SharedAccessKey=dKwsHSWDJA3Gy4wZqG+TQ36dVt1cfAgvl4B/LCz+PG0=");
+                registryManager = RegistryManager.CreateFromConnectionString(connectionString);
+                if (!AddmyDevicesAsync(devices).Result) //fails to add devices, in this case, some devices already registered
+                {    //read from IoT Hub
+                    devices=ReadmyDevicesAsync(no_device).Result;
+                }
+
+                //write file for re-run
+                File.WriteAllText(device_json_file, JsonConvert.SerializeObject(devices, Formatting.Indented));
+
+            }
+
+            //run thread for each device
+            
+            for(int i = 0; i < no_device; i++)
+            {
+                SendDeviceToCloudMessagesAsync(devices.ElementAt(i));
+            }
+            //devices.ToList().ForEach(SendDeviceToCloudMessagesAsync);
+            
+            //deviceClient = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(deviceId, deviceKey),(Microsoft.Azure.Devices.Client.TransportType)2);
+
             //deviceClient.OpenAsync();
             //if (mode == "1")
             //{
             //    Console.WriteLine("Simulated device\n");
-                
-            //    SendDeviceToCloudMessagesAsync(deviceId);
+
+
             //}
             //else
             //{
-                ReceiveC2dAsync(deviceId);
+            //    ReceiveC2dAsync(deviceId);
             //}
             //Console.WriteLine("Program exit. Type Enter.");
             Console.ReadLine();
@@ -113,8 +148,7 @@ namespace IoTDevices
                     Console.WriteLine("Message Sent: {0}", messagestring);
                     Trace.TraceInformation("Message Sent: {0}", messagestring);
                     Console.ResetColor();
-
-                    await deviceClient.CompleteAsync(receivedMessage);
+                    
                 }
                 catch (Exception exception)
                 {
@@ -128,26 +162,24 @@ namespace IoTDevices
 
             }
         }
-        private static async void SendDeviceToCloudMessagesAsync(string deviceId)
+        private static async void SendDeviceToCloudMessagesAsync(Device device)
         {
-            double avgWindSpeed = 10; // m/s
-            Random rand = new Random();
-
-            var devPerf = new DevicePerformance();
+            deviceClient = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(device.Id, device.Authentication.SymmetricKey.PrimaryKey), (Microsoft.Azure.Devices.Client.TransportType)2);
 
             while (true)
             {
                 try
                 {
-                    devPerf.set_cpuvalue();
-                    devPerf.set_memvalue();
-
-                    var telemetrydatapoint = new { deviceid = deviceId, CPUusage = devPerf.cpuusage, MEMusage = devPerf.memusage };
+                    var telemetrydatapoint = new { DeviceID = device.Id, StartTime = instanceTime.ToUniversalTime().ToString("O"), DeviceTime = DateTime.Now.ToUniversalTime().ToString("O") };
                     var messagestring = JsonConvert.SerializeObject(telemetrydatapoint);
                     var message = new Microsoft.Azure.Devices.Client.Message(Encoding.ASCII.GetBytes(messagestring));
                     await deviceClient.SendEventAsync(message);
-                    Console.WriteLine("{0} > sending message: {1}", DateTime.Now, messagestring);
-                    
+
+                    //Console.ForegroundColor = ConsoleColor.Yellow;
+                    //Console.WriteLine("Message Sent: {0}", messagestring);
+                    //Trace.TraceInformation("Message Sent: {0}", messagestring);
+                    //Console.ResetColor();
+
                 }
                 catch (Exception exception)
                 {
@@ -156,27 +188,47 @@ namespace IoTDevices
                     Console.ResetColor();
                 }
 
-                Thread.Sleep(1000);
+                //Thread.Sleep(5000);
 
             }
 
 
         }
 
-        private async static Task<string> AddmyDeviceAsync(string deviceId)
+        private async static Task<bool> AddmyDevicesAsync(IEnumerable<Device> devices)
         {
             //string deviceId = "myFirstDevice4";
-            Device device;
-            try
-            {
-                device = await registryManager.AddDeviceAsync(new Device(deviceId));
-            }
-            catch (DeviceAlreadyExistsException)
-            {
-                device = await registryManager.GetDeviceAsync(deviceId);
-            }
-            return device.Authentication.SymmetricKey.PrimaryKey;
+            var result = new BulkRegistryOperationResult();
+            //var devices = new List<Device>();
+            //Dictionary<string, string>.KeyCollection keys = devmap.Keys;
+            //foreach (string key in keys)
+            //{
+            //    devices.Add(new Device(key));
+            //}
+
+            //var devices = Enumerable.Range(0, no_device)
+            //    .ToList().Select(x => "device" + x.ToString()).Select(x=>new Device(x));
+
+            //try
+            //{
+            result = await registryManager.AddDevices2Async(devices);
+            //    //await registryManager.AddDeviceAsync(new Device("test"));
+            //}
+            //catch (DeviceAlreadyExistsException)
+            //{
+            //    //device = await registryManager.GetDeviceAsync(deviceId);
+            //}
+            return result.IsSuccessful;
+            //if (result.Errors.All(x=>x==false))
+            //    return true;
+            //else
+            //    return false;
+            //return device.Authentication.SymmetricKey.PrimaryKey;
             
+        }
+        private async static Task<IEnumerable<Device>> ReadmyDevicesAsync(int no_device)
+        {
+            return await registryManager.GetDevicesAsync(no_device);
         }
     }
 }
