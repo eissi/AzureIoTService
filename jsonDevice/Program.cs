@@ -32,8 +32,10 @@ namespace IoTDevices
 
         static void Main(string[] args)
         {
+            string tracefile = System.Diagnostics.Process.GetCurrentProcess().ProcessName+"-"+ DateTime.Now +".log";
+            //Console.WriteLine(tracefile);
 
-            Trace.Listeners.Add(new TextWriterTraceListener("device.log"));
+            Trace.Listeners.Add(new TextWriterTraceListener(tracefile));
             Trace.AutoFlush = true;
 
             string mode;
