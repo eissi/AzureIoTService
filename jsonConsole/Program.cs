@@ -53,11 +53,14 @@ namespace IoTConsole
 
         static bool isfirst = true;
 
+        static Dictionary<string,int> partition_event = new Dictionary<string, int>();
+
         static int messageCount = 0;
         static void Main(string[] args)
         {
             Trace.Listeners.Add(new TextWriterTraceListener("console.log"));
             Trace.AutoFlush = true;
+
 
             instanceTime = DateTime.Now;
 
@@ -99,17 +102,21 @@ namespace IoTConsole
             //receive용
             eventHubClient = EventHubClient.CreateFromConnectionString(eventhubconnectionString, iotHubD2cEndpoint);
             var d2cPartitions = eventHubClient.GetRuntimeInformation().PartitionIds;
+            
             foreach (string partition in d2cPartitions)
             {
+                partition_event.Add(partition, 0);
                 ReceiveMessagesFromDeviceAsync(partition);
             }
-
-            Process process = new Process();
-            process.StartInfo.FileName = "..\\..\\..\\jsonDevice\\bin\\Debug\\jsonDevice.exe";
-            process.StartInfo.WorkingDirectory = "..\\..\\..\\jsonDevice\\bin\\Debug";
-            //process.StartInfo.Arguments = "somefile.txt";
-            process.Start();
-
+            if (isfirst)
+            {
+                Process process = new Process();
+                process.StartInfo.FileName = "..\\..\\..\\jsonDevice\\bin\\Debug\\jsonDevice.exe";
+                process.StartInfo.WorkingDirectory = "..\\..\\..\\jsonDevice\\bin\\Debug";
+                //process.StartInfo.Arguments = "somefile.txt";
+                process.Start();
+                isfirst = false;
+            }
             //try
             //{
             //    SendCloudToDeviceMessageAsync().Wait();
@@ -325,8 +332,8 @@ namespace IoTConsole
                 string finish = finishTime.ToUniversalTime().ToString("O");
                 DateTime devTime;
                 string devTimeString = timing.DeviceTime;
-                DateTime.TryParseExact(devTimeString, "O", null, System.Globalization.DateTimeStyles.None, out devTime);
-                TimeSpan elapsedTime = finishTime - startTime;
+                DateTime.TryParseExact(devTimeString, "O", null, System.Globalization.DateTimeStyles.AssumeUniversal, out devTime);
+                TimeSpan elapsedTime = finishTime - devTime;
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("Elapsed Time:{1}:{0}", elapsedTime, ++messageCount);
                 Console.ResetColor();
@@ -338,8 +345,8 @@ namespace IoTConsole
                 INSERT dbo.PerfLogs (DeviceID, ServiceSendTime, DeviceTime, IoTHubReceiveTime, ServiceReceiveTime, ElapsedTime, TimeOut, Success, ServiceSDKversion, DeviceSDKversion, InstanceStartTime, Description)
                 VALUES (@DeviceID, @ServiceSendTime, @DeviceTime, @IoTHubReceiveTime, @ServiceReceiveTime, @ElapsedTime, @TimeOut, @Success, @ServiceSDKversion, @DeviceSDKversion, @InstanceStartTime, @Description)";
 
-                cmd.Parameters.AddWithValue("@DeviceID", deviceId);
-                cmd.Parameters.AddWithValue("@ServiceSendTime", startTime.ToUniversalTime());
+                cmd.Parameters.AddWithValue("@DeviceID", timing.DeviceID);
+                cmd.Parameters.AddWithValue("@ServiceSendTime", timing.StartTime);
                 cmd.Parameters.AddWithValue("@ServiceReceiveTime", finishTime.ToUniversalTime());
                 cmd.Parameters.AddWithValue("@ElapsedTime", elapsedTime.TotalMilliseconds);
                 cmd.Parameters.AddWithValue("@TimeOut", 30000);
@@ -350,7 +357,7 @@ namespace IoTConsole
                 cmd.Parameters.AddWithValue("@DeviceTime", devTime.ToUniversalTime());
                 cmd.Parameters.AddWithValue("@IoTHubReceiveTime", msg.enqueuedTime);
 
-                cmd.Parameters.AddWithValue("@InstanceStartTime", instanceTime.ToUniversalTime());
+                cmd.Parameters.AddWithValue("@InstanceStartTime", timing.StartTime);
 
                 cmd.Parameters.AddWithValue("@Description", desc);
 
@@ -365,8 +372,8 @@ namespace IoTConsole
                 }
 
 
-                Trace.TraceInformation("Processed:{3}: {0},{1},{2}", msg.message, finish, elapsedTime.TotalMilliseconds, DateTime.Now);
-                Console.WriteLine("Processed:{3}: {0},{1},{2}", msg.message, finish, elapsedTime.TotalMilliseconds, DateTime.Now);
+                Trace.TraceInformation("Processed:{4}: {0},{1},{2},{3}", msg.message, finish, devTime, elapsedTime.TotalMilliseconds, DateTime.Now);
+                Console.WriteLine("Processed:{4}: {0},{1},{2},{3}", msg.message, finish, devTime, elapsedTime.TotalMilliseconds, DateTime.Now);
                 startTimeString = "";
             //while (true)
             //{

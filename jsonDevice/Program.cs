@@ -44,7 +44,7 @@ namespace IoTDevices
             //Console.Write("Number of devices:");
             //string deviceno = Console.ReadLine();
             //string deviceId = ".net";
-            int no_device=10;
+            int no_device=1;
             Console.WriteLine("The number of devices to be simulated: {0}", no_device);
             IEnumerable<Device> devices=null;
             
@@ -188,7 +188,7 @@ namespace IoTDevices
                     Console.ResetColor();
                 }
 
-                //Thread.Sleep(5000);
+                Thread.Sleep(5000);
 
             }
 
