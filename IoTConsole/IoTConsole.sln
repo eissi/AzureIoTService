@@ -10,6 +10,9 @@ EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database1", "Database1\Database1.sqlproj", "{2A9C386A-156B-4DA8-8A4A-38DF97E03A4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jsonConsole", "..\jsonConsole\jsonConsole.csproj", "{398C0567-9236-45FA-AAC2-A01A60466AFA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{01B5A06A-26E6-48AF-BB39-CE6E1A20DAE6} = {01B5A06A-26E6-48AF-BB39-CE6E1A20DAE6}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jsonDevice", "..\jsonDevice\jsonDevice.csproj", "{01B5A06A-26E6-48AF-BB39-CE6E1A20DAE6}"
 EndProject
