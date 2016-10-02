@@ -33,7 +33,9 @@ select distinct description from PerfLogs
 
 select * from PerfLogs where deviceid='a' or deviceid='c'
 
-delete from PerfLogs where deviceid='32part'
+delete from PerfLogs where ServiceSendTime=(select top 1 servicesendtime from PerfLogs where datediff(minute,Devicetime,getdate())<60 order by ServiceSendTime desc)
+
+select top 1 servicesendtime from PerfLogs where datediff(minute,Devicetime,getdate())<60 order by ServiceSendTime desc
 
 --check performance
 Declare @StartTime datetime2
@@ -63,3 +65,5 @@ select
 	from PerfLogs 
 	where DeviceSDKversion=@DeviceSDKVersion
 	group by Description, DeviceSDKversion
+
+	select * from PerfLogs

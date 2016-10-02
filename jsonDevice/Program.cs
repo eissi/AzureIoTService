@@ -33,8 +33,8 @@ namespace IoTDevices
         static DateTime instanceTime = DateTime.Now;
 
         
-        static int no_device = 1;
-        static int no_event_device=10000;
+        static int no_device = 4;
+        static int no_event_device=2500;
         static int no_event = no_device*no_event_device;
         static void Main(string[] args)
         {
