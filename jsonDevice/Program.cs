@@ -34,12 +34,12 @@ namespace IoTDevices
 
         
         static int no_device = 1;
-        static int no_event_device=1000;
+        static int no_event_device=10000;
         static int no_event = no_device*no_event_device;
         static void Main(string[] args)
         {
-            string tracefile = System.Diagnostics.Process.GetCurrentProcess().ProcessName + "-" + DateTime.Now.ToString("yyyyMMddHHMMss") + ".log";
-            //Console.WriteLine(tracefile);
+            string tracefile = System.Diagnostics.Process.GetCurrentProcess().ProcessName + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".log";
+            Console.WriteLine(tracefile);
 
             Trace.Listeners.Add(new TextWriterTraceListener(tracefile));
             Trace.AutoFlush = true;

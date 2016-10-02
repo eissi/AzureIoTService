@@ -115,7 +115,7 @@ namespace IoTConsole
             {
             
                 event_count.Add(partition, 0);
-                    conn.Add(partition, new SqlConnection("Server=tcp:juleeasia.database.windows.net,1433;Initial Catalog=iotdb;Persist Security Info=False;User ID=julee;Password=Passw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
+                    conn.Add(partition, new SqlConnection("Server=tcp:juleeasia.database.windows.net,1433;Initial Catalog=iot2;Persist Security Info=False;User ID=julee;Password=Passw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
                     conn[partition].Open();
 
                 
