@@ -26,9 +26,10 @@ namespace IoTConsole
     class Program
     {
         static RegistryManager registryManager;
-        static string connectionString = "HostName=julee32part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=8pcjgER2HvyEcV1B3JtOsXhIQHDaKBwHC23iedWOS7I=";
+        static string connectionString = "HostName=j2part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=rwVuPRFKt18FJNMrCbnKnv91N0Xc2UCwPXR0Gmipzsw=";
         static ServiceClient serviceClient;
-        static string serviceConnectionString = "HostName=julee32part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=8pcjgER2HvyEcV1B3JtOsXhIQHDaKBwHC23iedWOS7I=";
+        //static string serviceConnectionString = "HostName=julee32part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=8pcjgER2HvyEcV1B3JtOsXhIQHDaKBwHC23iedWOS7I=";
+        static string serviceConnectionString = connectionString;
 
         //for operations monitoring
         static string operConnectionString = serviceConnectionString;
@@ -43,7 +44,8 @@ namespace IoTConsole
         static int timeout = 10; //seconds
 
         static DateTime instanceTime;
-        static SqlConnection conn;
+        static Dictionary<string,SqlConnection> conn;
+        static Dictionary<string, int> event_count;
         static string dvcSDKver;
         static string svcSDKver;
         static string deviceId;
@@ -56,16 +58,20 @@ namespace IoTConsole
         static Dictionary<string,int> partition_event = new Dictionary<string, int>();
 
         static int messageCount = 0;
+
+        private static object lockObject = new object();
+
         static void Main(string[] args)
         {
-            Trace.Listeners.Add(new TextWriterTraceListener("console.log"));
+            string tracefile = System.Diagnostics.Process.GetCurrentProcess().ProcessName + "-" + DateTime.Now.ToString("yyyyMMddHHMMss") + ".log";
+            //Console.WriteLine(tracefile);
+
+            Trace.Listeners.Add(new TextWriterTraceListener(tracefile));
             Trace.AutoFlush = true;
 
 
             instanceTime = DateTime.Now;
 
-            conn = new SqlConnection("Server=tcp:juleeasia.database.windows.net,1433;Initial Catalog=iotdb;Persist Security Info=False;User ID=julee;Password=Passw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
-            conn.Open();
 
             dvcSDKver = ".Net 1.0.2";
             svcSDKver = ".Net 1.0.3";
@@ -102,10 +108,17 @@ namespace IoTConsole
             //receive용
             eventHubClient = EventHubClient.CreateFromConnectionString(eventhubconnectionString, iotHubD2cEndpoint);
             var d2cPartitions = eventHubClient.GetRuntimeInformation().PartitionIds;
-            
+
+            conn = new Dictionary<string, SqlConnection>();
+            event_count = new Dictionary<string, int>();
             foreach (string partition in d2cPartitions)
             {
-                partition_event.Add(partition, 0);
+            
+                event_count.Add(partition, 0);
+                    conn.Add(partition, new SqlConnection("Server=tcp:juleeasia.database.windows.net,1433;Initial Catalog=iotdb;Persist Security Info=False;User ID=julee;Password=Passw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
+                    conn[partition].Open();
+
+                
                 ReceiveMessagesFromDeviceAsync(partition);
             }
             if (isfirst)
@@ -150,10 +163,19 @@ namespace IoTConsole
             //    }
 
             //}
+            while (true)
+            {
+                Dictionary<string, int>.KeyCollection keys = event_count.Keys;
+                foreach (string key in keys)
+                { Console.Write("{0}:{1},", key, event_count[key]); }
+                Console.WriteLine("");
+                Thread.Sleep(60000);
+            }
+
             Console.WriteLine("Program Running. Pless anykey to terminate!");
             Console.ReadLine();
 
-            conn.Close();
+            //conn.Close();
 
 
         }
@@ -220,8 +242,8 @@ namespace IoTConsole
                 IoTHubMessage msg = new IoTHubMessage();
                 msg.enqueuedTime = eventData.EnqueuedTimeUtc;
                 msg.message = Encoding.UTF8.GetString(eventData.GetBytes());
-                //Trace.TraceInformation("RECEIVED: {0}", msg.message);
-                //Console.WriteLine("RECEIVED: {0}", msg.message);
+                Trace.TraceInformation("RECEIVED: {0}", msg.message);
+                Console.WriteLine("RECEIVED: {0}", msg.message);
 
                 ProcessMonitorMessageAsync(msg);
 
@@ -238,6 +260,7 @@ namespace IoTConsole
                 //try
                 //{
                 eventData = await eventHubReceiver.ReceiveAsync(TimeSpan.FromSeconds(1));
+                
                 //    //Trace.TraceInformation("RAW RECEIVED:{1}: {0}", Encoding.UTF8.GetString(eventData.GetBytes()), DateTime.Now);
                 //    //Console.WriteLine("RAW RECEIVED:{1}: {0}", Encoding.UTF8.GetString(eventData.GetBytes()), DateTime.Now);
                 //}
@@ -293,10 +316,10 @@ namespace IoTConsole
                 IoTHubMessage msg = new IoTHubMessage();
                 msg.enqueuedTime = eventData.EnqueuedTimeUtc;
                 msg.message = Encoding.UTF8.GetString(eventData.GetBytes());
-                //Trace.TraceInformation("RECEIVED: {0}", msg.message);
-                //Console.WriteLine("RECEIVED: {0}", msg.message);
-
-                ProcessMessageAsync(msg);
+                //Trace.TraceInformation("RECEIVED: Partition:{0}, MSG:{1}", partition, msg.message);
+                //Console.WriteLine("RECEIVED: Partition:{0}, MSG:{1}", partition,msg.message);
+                event_count[partition]++;
+                ProcessMessageAsync(msg, partition);
 
 
             }
@@ -313,7 +336,7 @@ namespace IoTConsole
             Console.WriteLine("{0}:MONITOR-> CATEGORY:{1}, OPERATION:{2}, DEVICEID:{3}", DateTime.Now, monitor.category, monitor.operationName, monitor.deviceId);
 
         }
-        static async void ProcessMessageAsync(IoTHubMessage msg)
+        static async void ProcessMessageAsync(IoTHubMessage msg, string partition)
         {
             //Console.WriteLine("Enter: Processing command received! - {0}", msg.message);
             //string[] timing = msg.message.Split(',');
@@ -334,13 +357,17 @@ namespace IoTConsole
                 string devTimeString = timing.DeviceTime;
                 DateTime.TryParseExact(devTimeString, "O", null, System.Globalization.DateTimeStyles.AssumeUniversal, out devTime);
                 TimeSpan elapsedTime = finishTime - devTime;
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Elapsed Time:{1}:{0}", elapsedTime, ++messageCount);
-                Console.ResetColor();
-                //file.WriteLine("{0},{1},{2}", commandReceived, finish, elapsedTime.TotalMilliseconds);
-                //file.FlushAsync();
+            if (++messageCount % 100 == 0)
+                Console.WriteLine("Message Processed: {0}",messageCount);
+            //Console.ForegroundColor = ConsoleColor.Yellow;
+            //Console.WriteLine("Elapsed Time:{1}:{0}", elapsedTime, ++messageCount);
+            //Console.ResetColor();
+            //file.WriteLine("{0},{1},{2}", commandReceived, finish, elapsedTime.TotalMilliseconds);
+            //file.FlushAsync();
 
-                var cmd = conn.CreateCommand();
+            
+
+                var cmd = conn[partition].CreateCommand();
                 cmd.CommandText = @"
                 INSERT dbo.PerfLogs (DeviceID, ServiceSendTime, DeviceTime, IoTHubReceiveTime, ServiceReceiveTime, ElapsedTime, TimeOut, Success, ServiceSDKversion, DeviceSDKversion, InstanceStartTime, Description)
                 VALUES (@DeviceID, @ServiceSendTime, @DeviceTime, @IoTHubReceiveTime, @ServiceReceiveTime, @ElapsedTime, @TimeOut, @Success, @ServiceSDKversion, @DeviceSDKversion, @InstanceStartTime, @Description)";
@@ -361,20 +388,22 @@ namespace IoTConsole
 
                 cmd.Parameters.AddWithValue("@Description", desc);
 
-                try
-                {
+            try
+            {
+
                     cmd.ExecuteScalar();
-                }
-                catch (Exception e)
-                {
-                    Trace.TraceError("{0}: SQL Exception - {1}", DateTime.Now, e.Message);
-                    Console.WriteLine("{0}: SQL Exception - {1}", DateTime.Now, e.Message);
-                }
+                
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("{0}: SQL Exception - {1}", DateTime.Now, e.Message);
+                Console.WriteLine("{0}: SQL Exception - {1}", DateTime.Now, e.Message);
+            }
 
-
-                Trace.TraceInformation("Processed:{4}: {0},{1},{2},{3}", msg.message, finish, devTime, elapsedTime.TotalMilliseconds, DateTime.Now);
-                Console.WriteLine("Processed:{4}: {0},{1},{2},{3}", msg.message, finish, devTime, elapsedTime.TotalMilliseconds, DateTime.Now);
-                startTimeString = "";
+            
+            //Trace.TraceInformation("Processed:{4}: {0},{1},{2},{3}", msg.message, finish, devTime, elapsedTime.TotalMilliseconds, DateTime.Now);
+            //Console.WriteLine("Processed:{4}: {0},{1},{2},{3}", msg.message, finish, devTime, elapsedTime.TotalMilliseconds, DateTime.Now);
+            startTimeString = "";
             //while (true)
             //{
             //    try

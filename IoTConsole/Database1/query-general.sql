@@ -32,4 +32,4 @@ select count(logcreatedtime)/datediff(second,min(logcreatedtime),max(logcreatedt
 select distinct description from PerfLogs
 
 select * from PerfLogs where id>309579 order by id desc 
-select * from PerfLogs where DeviceSDKversion='Test'
+select * from PerfLogs where datediff(day,devicetime,getdate())=0
