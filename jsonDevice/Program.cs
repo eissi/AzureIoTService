@@ -46,7 +46,7 @@ namespace IoTDevices
             Task<string> task = AddmyDeviceAsync(args[0]);
             string deviceKey = task.Result;
 
-
+            
             //run thread for each device
             deviceClient = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(args[0], deviceKey), (Microsoft.Azure.Devices.Client.TransportType)2);
 
