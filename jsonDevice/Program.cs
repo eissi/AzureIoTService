@@ -22,12 +22,12 @@ namespace IoTDevices
      
 
         static DeviceClient deviceClient;
-        static string iotHubUri = "julees1.azure-devices.net";
+        static string iotHubUri = "julee32part.azure-devices.net";
         //static string deviceKey = "rDSDirCgGmtZB0BSqW7fGUWaM2m3SRqBh81Csgc0leU=";
 
         // for add devices
         static RegistryManager registryManager;
-        static string connectionString = "HostName=julees1.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=TMIzVSL6aaDQanhIg0nb3Bss82FLg4ckKVlRDlUDvwE=";
+        static string connectionString = "HostName=julee32part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=8pcjgER2HvyEcV1B3JtOsXhIQHDaKBwHC23iedWOS7I=";
 
 
         static void Main(string[] args)
