@@ -33,3 +33,5 @@ select distinct description from PerfLogs
 
 select * from PerfLogs where id>309579 order by id desc 
 select * from PerfLogs where datediff(day,devicetime,getdate())=0
+
+select top 1 servicesendtime from PerfLogs where datediff(minute,Devicetime,getdate())<60
