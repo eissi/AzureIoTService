@@ -26,7 +26,7 @@ namespace IoTConsole
     class Program
     {
         static RegistryManager registryManager;
-        static string connectionString = "HostName=j2part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=rwVuPRFKt18FJNMrCbnKnv91N0Xc2UCwPXR0Gmipzsw=";
+        static string connectionString = "HostName=j4p.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=yTGdPaiQjNQnL3k2Z7csbHEi1dfkhiWvJTgBTeh7Gws=";
         static ServiceClient serviceClient;
         //static string serviceConnectionString = "HostName=julee32part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=8pcjgER2HvyEcV1B3JtOsXhIQHDaKBwHC23iedWOS7I=";
         static string serviceConnectionString = connectionString;
@@ -166,10 +166,17 @@ namespace IoTConsole
             while (true)
             {
                 Dictionary<string, int>.KeyCollection keys = event_count.Keys;
-                foreach (string key in keys)
-                { Console.Write("{0}:{1},", key, event_count[key]); }
-                Console.WriteLine("");
-                Thread.Sleep(60000);
+                try {
+                    foreach (string key in keys)
+                    { Console.Write("{0}:{1},", key, event_count[key]); }
+                    Console.WriteLine("");
+                    Thread.Sleep(60000);
+                }
+                catch(Exception ex)
+                {
+
+                }
+                
             }
 
             Console.WriteLine("Program Running. Pless anykey to terminate!");

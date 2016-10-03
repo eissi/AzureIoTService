@@ -23,19 +23,20 @@ namespace IoTDevices
 
 
         //static DeviceClient deviceClient;
-        static string iotHubUri = "j2part.azure-devices.net";
+        static string iotHubUri = "j4p.azure-devices.net";
         //static string deviceKey = "rDSDirCgGmtZB0BSqW7fGUWaM2m3SRqBh81Csgc0leU=";
 
         // for add devices
         static RegistryManager registryManager;
-        static string connectionString = "HostName=j2part.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=rwVuPRFKt18FJNMrCbnKnv91N0Xc2UCwPXR0Gmipzsw=";
+        static string connectionString = "HostName=j4p.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=yTGdPaiQjNQnL3k2Z7csbHEi1dfkhiWvJTgBTeh7Gws=";
 
         static DateTime instanceTime = DateTime.Now;
 
         
-        static int no_device = 1;
-        static int no_event_device=10000;
+        static int no_device = 8;
+        static int no_event_device=30000;
         static int no_event = no_device*no_event_device;
+        static int sleeptime = 1000;
         static void Main(string[] args)
         {
             string tracefile = System.Diagnostics.Process.GetCurrentProcess().ProcessName + "-" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".log";
@@ -82,7 +83,7 @@ namespace IoTDevices
 
                 if (!AddmyDevicesAsync(devices).Result) //fails to add devices, in this case, some devices already registered
                 {    //read from IoT Hub
-                    devices = ReadmyDevicesAsync(no_device*2+5).Result;
+                    devices = ReadmyDevicesAsync(500).Result;
                     //devices = registryManager.GetDevicesAsync(no_device).Result;
                     //Device dev = registryManager.GetDeviceAsync("device0").Result;
                     //for (int i = 1; i < 15; i++)
@@ -103,10 +104,10 @@ namespace IoTDevices
             }
 
             //run thread for each device
-
+            var task = new List<Task>();
             for (int i = 0; i < no_device; i++)
             {
-                SendDeviceToCloudMessagesAsync(devices.ElementAt(i));
+                task.Add(SendDeviceToCloudMessagesAsync(devices.ElementAt(i)));
                 Thread.Sleep(100);
             }
             //devices.ToList().ForEach(SendDeviceToCloudMessagesAsync);
@@ -125,7 +126,11 @@ namespace IoTDevices
             //    ReceiveC2dAsync(deviceId);
             //}
             //Console.WriteLine("Program exit. Type Enter.");
-            Console.ReadLine();
+            Task.WaitAll(task.ToArray());
+            Console.WriteLine("All devices emitted events completely. This windows will close in one minute");
+            Thread.Sleep(60000);
+       
+            //Console.ReadLine();
         }
 
 
@@ -188,7 +193,7 @@ namespace IoTDevices
 
         //    }
         //}
-        private static async void SendDeviceToCloudMessagesAsync(Device device)
+        private static async Task SendDeviceToCloudMessagesAsync(Device device)
         {
             DeviceClient deviceClient;
             deviceClient = DeviceClient.Create(iotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(device.Id, device.Authentication.SymmetricKey.PrimaryKey), (Microsoft.Azure.Devices.Client.TransportType)2);
@@ -212,7 +217,7 @@ namespace IoTDevices
                         //Trace.TraceInformation("Message Sent: {0}", messagestring);
                         //Console.ResetColor();
                         if (no_event_device < no_event_emit++) break;
-                        Thread.Sleep(no_device*10);
+                        Thread.Sleep(sleeptime);
                     }
                     timer.Stop();
 
